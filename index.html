@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Daniel's Tank Game — Progress</title>
+<style>
+  :root{
+    --ink:#1f2430; --muted:#5b667a; --line:#e5e9f0;
+    --forge:#e8622c; --forge-soft:#fff1ea;
+    --blue:#2b6cb0; --blue-soft:#eaf3fb;
+    --green:#2f855a; --green-soft:#e9f7ef;
+    --amber:#b7791f; --amber-soft:#fdf3e0;
+    --bg:#f7f8fb; --card:#ffffff;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:"Segoe UI",system-ui,-apple-system,Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.6;font-size:17px}
+  .wrap{max-width:820px;margin:0 auto;padding:24px 20px 80px}
+  nav{display:flex;gap:8px;margin-bottom:18px}
+  nav a{flex:0 0 auto;text-decoration:none;font-weight:700;font-size:15px;
+    padding:8px 16px;border-radius:999px;border:1px solid var(--line);color:var(--muted);background:#fff}
+  nav a.active{background:var(--forge);color:#fff;border-color:var(--forge)}
+  header.hero{background:linear-gradient(135deg,#e8622c,#c23e12);color:#fff;
+    border-radius:20px;padding:28px 30px;margin-bottom:22px;box-shadow:0 10px 30px rgba(194,62,18,.25)}
+  header.hero h1{margin:0 0 4px;font-size:30px}
+  header.hero p{margin:0;opacity:.95}
+  .updated{font-size:13px;opacity:.9;margin-top:8px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;
+    padding:20px 22px;margin:14px 0;box-shadow:0 2px 8px rgba(31,36,48,.04)}
+  .barwrap{background:#eef1f6;border-radius:999px;height:26px;overflow:hidden;margin:8px 0 6px}
+  .bar{height:100%;background:linear-gradient(90deg,#2f855a,#38a169);width:0;
+    transition:width .6s ease;border-radius:999px}
+  .barlabel{font-weight:700;font-size:15px;color:var(--green)}
+  h2{font-size:22px;margin:26px 0 10px}
+  .m{display:flex;gap:14px;align-items:flex-start;border:1px solid var(--line);
+    border-radius:14px;padding:14px 16px;margin:10px 0;background:#fff}
+  .m .icon{font-size:26px;line-height:1.2}
+  .m .body{flex:1}
+  .m .body b{font-size:18px}
+  .m .body p{margin:3px 0 0;color:var(--muted);font-size:15px}
+  .pill{display:inline-block;font-size:12px;font-weight:800;border-radius:999px;
+    padding:3px 11px;white-space:nowrap;text-transform:uppercase;letter-spacing:.4px}
+  .p-done{background:var(--green-soft);color:var(--green)}
+  .p-doing{background:var(--amber-soft);color:var(--amber)}
+  .p-todo{background:#eef1f6;color:var(--muted)}
+  .m.done{background:var(--green-soft);border-color:#bfe6cd}
+  .m.doing{background:var(--amber-soft);border-color:#f0dcae}
+  ul.recent{list-style:none;padding:0;margin:6px 0 0}
+  ul.recent li{padding:8px 0;border-bottom:1px solid var(--line);font-size:15px}
+  ul.recent li:last-child{border-bottom:0}
+  ul.recent .date{color:var(--muted);font-size:13px;margin-right:8px;font-variant-numeric:tabular-nums}
+  .muted{color:var(--muted)}
+  footer{color:var(--muted);font-size:13px;text-align:center;margin-top:34px}
+  .refresh{font-size:13px;color:var(--muted);text-align:right;margin-top:-6px}
+  .err{background:#fff6f5;border:1px solid #f3c9c1;border-radius:12px;padding:14px 16px;color:#a23b2a}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav>
+    <a href="index.html" class="active">📊 Progress</a>
+    <a href="guide.html">📖 Guide</a>
+  </nav>
+
+  <header class="hero">
+    <h1>🛠️ Daniel's Tank Game</h1>
+    <p id="summary">Loading the latest progress…</p>
+    <div class="updated" id="updated"></div>
+  </header>
+
+  <div class="card">
+    <div class="barlabel" id="pct">—</div>
+    <div class="barwrap"><div class="bar" id="bar"></div></div>
+    <div class="muted" style="font-size:14px" id="counts"></div>
+  </div>
+
+  <h2>🎯 Milestones</h2>
+  <div id="milestones"><div class="muted">Loading…</div></div>
+
+  <h2>📰 Recent Updates</h2>
+  <div class="card" style="margin-top:8px">
+    <ul class="recent" id="recent"><li class="muted">Loading…</li></ul>
+  </div>
+
+  <div class="refresh">This page updates itself as @forge builds. Auto-refreshing every 60s. <a href="#" onclick="load();return false;">Refresh now</a></div>
+
+  <footer>Made by Daniel, Dad &amp; Claude · Powered by FORGE 🔥</footer>
+</div>
+
+<script>
+  var STATUS = {
+    done:  {cls:"done",  pill:"p-done",  label:"Done",     icon:"✅"},
+    in_progress:{cls:"doing", pill:"p-doing", label:"Building", icon:"🔨"},
+    todo:  {cls:"todo",  pill:"p-todo",  label:"To do",     icon:"⬜"}
+  };
+  function esc(s){return String(s==null?"":s).replace(/[&<>]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;"}[c];});}
+
+  function render(d){
+    document.getElementById("summary").textContent = d.summary || "Building the tank game!";
+    document.getElementById("updated").textContent = d.updated ? ("Last updated: " + d.updated) : "";
+    var ms = Array.isArray(d.milestones) ? d.milestones : [];
+    var done = ms.filter(function(m){return m.status==="done";}).length;
+    var pct = ms.length ? Math.round(done/ms.length*100) : 0;
+    document.getElementById("pct").textContent = pct + "% complete";
+    document.getElementById("bar").style.width = pct + "%";
+    document.getElementById("counts").textContent =
+      done + " of " + ms.length + " milestones done";
+
+    document.getElementById("milestones").innerHTML = ms.map(function(m){
+      var s = STATUS[m.status] || STATUS.todo;
+      return '<div class="m '+s.cls+'"><div class="icon">'+s.icon+'</div>'+
+        '<div class="body"><b>'+esc(m.title)+'</b> '+
+        '<span class="pill '+s.pill+'">'+s.label+'</span>'+
+        (m.detail?'<p>'+esc(m.detail)+'</p>':'')+'</div></div>';
+    }).join("") || '<div class="muted">No milestones yet.</div>';
+
+    var rec = Array.isArray(d.recent) ? d.recent.slice().reverse() : [];
+    document.getElementById("recent").innerHTML = rec.map(function(r){
+      return '<li><span class="date">'+esc(r.date)+'</span>'+esc(r.text)+'</li>';
+    }).join("") || '<li class="muted">Nothing yet — ask @forge to build the first milestone!</li>';
+  }
+
+  function load(){
+    fetch("progress.json?t=" + Date.now(), {cache:"no-store"})
+      .then(function(r){ if(!r.ok) throw new Error(r.status); return r.json(); })
+      .then(render)
+      .catch(function(e){
+        document.getElementById("milestones").innerHTML =
+          '<div class="err">Couldn\'t load progress yet. If the page was just set up, give it a minute and hit refresh.</div>';
+        document.getElementById("recent").innerHTML = "";
+      });
+  }
+  load();
+  setInterval(load, 60000);
+</script>
+</body>
+</html>

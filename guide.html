@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FORGE — How We Build Games With Claude</title>
+<style>
+  :root{
+    --ink:#1f2430; --muted:#5b667a; --line:#e5e9f0;
+    --forge:#e8622c; --forge-soft:#fff1ea;
+    --blue:#2b6cb0; --blue-soft:#eaf3fb;
+    --green:#2f855a; --green-soft:#e9f7ef;
+    --purple:#6b46c1; --purple-soft:#f1ecfb;
+    --yellow-soft:#fff8e6; --yellow-line:#f4d580;
+    --bg:#f7f8fb; --card:#ffffff;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:"Segoe UI",system-ui,-apple-system,Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.6; font-size:17px;
+  }
+  .wrap{max-width:860px; margin:0 auto; padding:24px 20px 80px}
+  header.hero{
+    background:linear-gradient(135deg,#e8622c,#c23e12);
+    color:#fff; border-radius:20px; padding:34px 30px; margin-bottom:26px;
+    box-shadow:0 10px 30px rgba(194,62,18,.25);
+  }
+  header.hero h1{margin:0 0 6px; font-size:34px; letter-spacing:.3px}
+  header.hero p{margin:0; font-size:19px; opacity:.95}
+  .tag{display:inline-block; background:rgba(255,255,255,.2); border-radius:999px;
+       padding:3px 12px; font-size:14px; font-weight:600; margin-bottom:12px}
+  h2{font-size:25px; margin:34px 0 12px; display:flex; align-items:center; gap:10px}
+  h3{font-size:20px; margin:22px 0 8px}
+  p{margin:10px 0}
+  .card{background:var(--card); border:1px solid var(--line); border-radius:16px;
+        padding:20px 22px; margin:14px 0; box-shadow:0 2px 8px rgba(31,36,48,.04)}
+  code,.cmd{font-family:"SF Mono",Consolas,Menlo,monospace}
+  .cmd{display:block; background:#12161f; color:#e7ecf5; border-radius:10px;
+       padding:12px 14px; margin:10px 0; font-size:15px; overflow-x:auto; white-space:pre}
+  .inline{background:#eef1f6; border-radius:6px; padding:1px 7px; font-size:15px}
+  .flow{display:flex; flex-wrap:wrap; gap:10px; margin:14px 0}
+  .flow .step{flex:1 1 150px; background:var(--forge-soft); border:1px solid #f5d3c3;
+        border-radius:14px; padding:14px; text-align:center}
+  .flow .step .n{font-size:26px; display:block; margin-bottom:4px}
+  .flow .step b{display:block; font-size:15px}
+  .flow .step small{color:var(--muted); font-size:13px}
+  .callout{border-radius:14px; padding:16px 18px; margin:14px 0; border:1px solid}
+  .tip{background:var(--green-soft); border-color:#bfe6cd}
+  .try{background:var(--blue-soft); border-color:#c5ddf1}
+  .warn{background:var(--yellow-soft); border-color:var(--yellow-line)}
+  .dad{background:var(--purple-soft); border-color:#d9caf3}
+  .callout b.lead{display:block; margin-bottom:4px}
+  ol,ul{margin:10px 0 10px 4px; padding-left:22px}
+  li{margin:7px 0}
+  .pill{display:inline-block; font-size:13px; font-weight:700; border-radius:999px;
+        padding:2px 10px; margin-left:6px; vertical-align:middle}
+  .once{background:#fdecec; color:#b03a3a}
+  .every{background:#e9f7ef; color:#2f855a}
+  .grid2{display:grid; grid-template-columns:1fr 1fr; gap:14px}
+  @media(max-width:640px){.grid2{grid-template-columns:1fr}}
+  .example{background:#fbfcfe; border:1px dashed #cfd8e6; border-radius:10px; padding:10px 12px; margin:8px 0}
+  .good::before{content:"✅ "}
+  .meh::before{content:"🙅 "}
+  .divider{height:1px; background:var(--line); margin:30px 0}
+  footer{color:var(--muted); font-size:14px; text-align:center; margin-top:36px}
+  a{color:var(--forge); font-weight:600}
+  .kbd{background:#eef1f6; border:1px solid #d5dbe6; border-bottom-width:2px;
+       border-radius:6px; padding:1px 7px; font-size:14px; font-family:inherit}
+  nav.top{display:flex;gap:8px;margin-bottom:16px}
+  nav.top a{text-decoration:none;font-weight:700;font-size:15px;padding:8px 16px;
+    border-radius:999px;border:1px solid var(--line);color:var(--muted);background:#fff}
+  nav.top a.active{background:var(--forge);color:#fff;border-color:var(--forge)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav class="top"><a href="index.html">📊 Progress</a><a href="guide.html" class="active">📖 Guide</a></nav>
+
+  <header class="hero">
+    <span class="tag">🛠️ FORGE — Fleet Of Repo-Grounded Engineers</span>
+    <h1>How We Build Games With Claude</h1>
+    <p>Daniel's guide to making his tank game with Dad and an AI helper — right from Slack.</p>
+  </header>
+
+  <div class="card">
+    <p style="margin-top:0"><b>Hi Daniel!</b> 👋 You had a game idea — a multiplayer Roblox tank game where you
+    <b>build your own tank</b> and battle on maps in <b>Domination</b> mode, like Sprocket meets War Thunder.
+    This guide shows how the whole thing works and how to set it up so <b>you</b> can build it yourself.</p>
+    <p>The helper is named <b>@forge</b>. It's Claude (a very smart coding AI) running on Dad's server.
+    You tell it what you want in Slack, and it writes the game for you. Then you test it and tell it what to change. That's it!</p>
+  </div>
+
+  <h2>🌍 The Big Picture</h2>
+  <p>Here's the whole journey of one idea, from your brain to the game:</p>
+  <div class="flow">
+    <div class="step"><span class="n">💬</span><b>1. You ask</b><small>Type <span class="inline">@forge</span> in Slack</small></div>
+    <div class="step"><span class="n">🤖</span><b>2. Claude builds</b><small>Writes the game code</small></div>
+    <div class="step"><span class="n">☁️</span><b>3. It saves</b><small>Code goes to GitHub</small></div>
+    <div class="step"><span class="n">🎮</span><b>4. You test</b><small>Play it in Roblox Studio</small></div>
+    <div class="step"><span class="n">🔁</span><b>5. You reply</b><small>Say what to change → repeat</small></div>
+  </div>
+  <div class="callout tip">
+    <b class="lead">🧠 The cool secret</b>
+    Everything @forge remembers about your game — the plan, the decisions, the notes — lives in your
+    game's <b>GitHub folder</b>. So even if you close everything and come back next week, it picks up right
+    where you left off. The folder <em>is</em> the game's brain.
+  </div>
+
+  <div class="divider"></div>
+
+  <h2>💻 Get Set Up On the Laptop</h2>
+  <p>Right now we'll use <b>Mom's laptop</b> (until your PC's new fan arrives). When your PC is fixed,
+  you just do these same steps once on it too. You do this setup <b>one time</b>; after that, building games is quick.</p>
+
+  <div class="callout dad">
+    <b class="lead">👨 For Dad — do these first (5 min)</b>
+    <ul style="margin-bottom:0">
+      <li>Invite Daniel to the Slack workspace and add him to <span class="inline">#proj-daniel</span>.</li>
+      <li>Give Daniel <b>read access</b> to the game code: on GitHub, add his account as a collaborator on
+          <span class="inline">daniels-tank-game</span> — or just sign in to GitHub Desktop with your account on the laptop.</li>
+      <li>Make sure Daniel knows his <b>Roblox login</b> (Studio needs it).</li>
+    </ul>
+  </div>
+
+  <h3>Step 1 — Slack <span class="pill once">one time</span></h3>
+  <ol>
+    <li>Open <a href="https://slack.com/downloads">slack.com</a> (or install the Slack app) and sign in to the family workspace.</li>
+    <li>Click into the <span class="inline">#proj-daniel</span> channel. This is where you talk to <b>@forge</b>.</li>
+  </ol>
+
+  <h3>Step 2 — Roblox Studio + the Rojo plugin <span class="pill once">one time</span></h3>
+  <p>Roblox Studio is where you'll <b>play and test</b> your game. Rojo is a helper that pipes the code from
+  the folder into Studio automatically.</p>
+  <ol>
+    <li>Get Roblox Studio from <a href="https://create.roblox.com/">create.roblox.com</a> → <b>Start Creating</b> → download and install → sign in with your Roblox account.</li>
+    <li>We'll install the <b>Rojo plugin</b> in Step 4 with one command (it makes sure the versions match).</li>
+  </ol>
+
+  <h3>Step 3 — Get the game code with GitHub Desktop <span class="pill once">one time</span></h3>
+  <ol>
+    <li>Install <a href="https://desktop.github.com/">GitHub Desktop</a> and sign in (with the account Dad gave access to).</li>
+    <li>Click <b>File → Clone repository</b>, find <span class="inline">daniels-tank-game</span>, and pick a folder you'll remember (like <span class="inline">Documents\daniels-tank-game</span>). Click <b>Clone</b>.</li>
+  </ol>
+  <div class="callout try">
+    <b class="lead">🔄 This is how you get updates later</b>
+    Whenever @forge builds something new, open GitHub Desktop and click <b>Fetch origin</b> then <b>Pull</b>.
+    That downloads Claude's latest code to the laptop. (You'll do this a lot — it's one click!)
+  </div>
+
+  <h3>Step 4 — Install Rojo (do this one with Dad) <span class="pill once">one time</span></h3>
+  <p>This part uses a black text window called <b>PowerShell</b>. It looks scary but it's just three lines. Ask Dad to sit with you the first time.</p>
+  <ol>
+    <li>Click the Windows Start button, type <b>PowerShell</b>, and open it.</li>
+    <li>Install <b>Rokit</b> (the tool that installs Rojo):
+      <span class="cmd">Invoke-RestMethod https://raw.githubusercontent.com/rojo-rbx/rokit/main/scripts/install.ps1 | Invoke-Expression</span>
+      Close PowerShell and open a new one so it wakes up.</li>
+    <li>Go into your game folder and add Rojo:
+      <span class="cmd">cd $HOME\Documents\daniels-tank-game
+rokit add rojo-rbx/rojo
+rokit install</span></li>
+    <li>Install the matching Studio plugin:
+      <span class="cmd">rojo plugin install</span>
+      Now the <b>Rojo</b> button will show up in Studio's <b>Plugins</b> tab.</li>
+  </ol>
+
+  <h3>Step 5 — Connect and play <span class="pill every">every time you build</span></h3>
+  <ol>
+    <li>In GitHub Desktop, click <b>Pull</b> to grab the newest code.</li>
+    <li>In PowerShell, start the sync server (leave this window open while you work):
+      <span class="cmd">cd $HOME\Documents\daniels-tank-game
+rojo serve</span></li>
+    <li>Open <b>Roblox Studio</b> → make a <b>New → Baseplate</b> (or open your saved place).</li>
+    <li>Click the <b>Plugins</b> tab → <b>Rojo</b> → <b>Connect</b>. The game code flows in! ✨</li>
+    <li>Press the big blue <b>Play</b> button to test it.</li>
+  </ol>
+  <div class="callout tip">
+    <b class="lead">💡 Ask Dad for a shortcut</b>
+    Dad can make a double-click icon that opens the folder and runs <span class="inline">rojo serve</span> for you,
+    so you skip the typing every time.
+  </div>
+
+  <div class="divider"></div>
+
+  <h2>🗣️ How to Talk to @forge</h2>
+  <p>@forge is smart, but it can't see your screen. The better you describe things, the better it builds. Here's the trick:</p>
+
+  <div class="grid2">
+    <div class="callout tip" style="margin:0">
+      <b class="lead">Do this</b>
+      <ul style="margin-bottom:0">
+        <li><b>Be specific.</b> Say exactly what you want.</li>
+        <li><b>One thing at a time.</b> Small steps build faster.</li>
+        <li><b>Say how it should feel</b> ("heavy and slow, like a real tank").</li>
+        <li><b>When testing, report exactly what happened</b> — good or broken.</li>
+      </ul>
+    </div>
+    <div class="callout warn" style="margin:0">
+      <b class="lead">Try not to</b>
+      <ul style="margin-bottom:0">
+        <li>Ask for the whole game in one message.</li>
+        <li>Say "it's broken" with no details.</li>
+        <li>Change five things at once (hard to test!).</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>Examples</h3>
+  <div class="example good">@forge Make the tank drive forward and back with W and S, and turn with A and D.</div>
+  <div class="example good">@forge The turret turns too fast — make it slower and heavier, like War Thunder. Give me steps to test it.</div>
+  <div class="example good">@forge When I press Play, the tank falls through the floor. It happens right when the game starts. Can you fix it?</div>
+  <div class="example meh">@forge make my whole tank game</div>
+  <div class="example meh">@forge it doesn't work</div>
+
+  <div class="divider"></div>
+
+  <h2>⚡ Daniel's Cheat Sheet</h2>
+  <div class="card">
+    <b>The building loop — every time:</b>
+    <ol style="margin-bottom:6px">
+      <li>Go to <span class="inline">#proj-daniel</span> in Slack.</li>
+      <li>Type <span class="inline">@forge</span> and ask for <b>one</b> thing.</li>
+      <li>Wait for the 🛠️ (it heard you), then read the reply. The <b>first</b> one each day is slow — be patient!</li>
+      <li>In GitHub Desktop → <b>Pull</b>.</li>
+      <li>Make sure <span class="inline">rojo serve</span> is running and Rojo is <b>Connected</b> in Studio.</li>
+      <li>Press <b>Play</b> and test.</li>
+      <li>Reply in the same Slack thread: what you liked + what to change (be specific!).</li>
+      <li>Repeat. 🎉</li>
+    </ol>
+    <b>Starter ideas to ask @forge:</b>
+    <ul style="margin-bottom:0">
+      <li>"Build a drivable tank on a flat test map, with a mouse-aimed turret and a chase camera. Give me steps to test it."</li>
+      <li>"Add a shell that shoots when I click, with travel time so I have to aim ahead."</li>
+      <li>"Add a capture point in the middle for Domination mode."</li>
+    </ul>
+  </div>
+
+  <div class="divider"></div>
+
+  <h2>🛠️ Dad's Cheat Sheet</h2>
+  <p>The bridge runs on ATLAS as a <span class="inline">systemd</span> service (user <span class="inline">forge</span>, on your Max plan, capped by <span class="inline">forge.slice</span>). It survives reboots and keeps running with no one logged in.</p>
+  <div class="card">
+    <b>Check on it (as <span class="inline">ubuntu</span>):</b>
+    <span class="cmd">forgectl status                 # is the bridge healthy?
+forgectl logs 50                # recent activity / errors
+sudo systemctl restart forge-bridge   # restart if needed</span>
+    <b>Peek at a live session:</b>
+    <span class="cmd">sudo -iu forge forgectl list                       # which sessions are running
+sudo -iu forge forgectl attach daniels-tank-game   # watch it work
+#   (leave with:  Ctrl-b  then  d )</span>
+    <b>Add a new game (Benjamin's, yours, a B&amp;C project):</b>
+    <p style="margin:6px 0 0">Follow <span class="inline">forge-template/docs/procedures/new-project-from-template.md</span>:
+    make a repo from the template → clone it into <span class="inline">~/forge/projects/</span> → set its Slack channel ID →
+    invite the bot. No bridge restart — it auto-discovers the new game on the first <span class="inline">@mention</span>.</p>
+  </div>
+
+  <div class="divider"></div>
+
+  <h2>🧯 If Something's Weird</h2>
+  <div class="grid2">
+    <div class="callout try" style="margin:0">
+      <b class="lead">Daniel</b>
+      <ul style="margin-bottom:0">
+        <li><b>@forge didn't answer?</b> Wait a minute (the first one is slow). Still nothing → tell Dad.</li>
+        <li><b>Game didn't change?</b> Did you <b>Pull</b> in GitHub Desktop and <b>Connect</b> Rojo?</li>
+        <li><b>Rojo won't connect?</b> Make sure the <span class="inline">rojo serve</span> window is still open.</li>
+        <li><b>Confused?</b> Ask @forge in the thread — it can explain what it did!</li>
+      </ul>
+    </div>
+    <div class="callout dad" style="margin:0">
+      <b class="lead">Dad</b>
+      <ul style="margin-bottom:0">
+        <li>Bridge quiet? <span class="inline">forgectl status</span> + <span class="inline">forgectl logs 50</span>.</li>
+        <li>Reply never posts? Check the Slack token in <span class="inline">~/forge/forge.env</span>.</li>
+        <li>Session stuck? <span class="inline">forgectl attach</span> to see it; <span class="inline">restart</span> the service if needed.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <h2>📜 House Rules</h2>
+  <div class="card" style="margin-bottom:0">
+    <ul style="margin:0">
+      <li><b>Be patient.</b> Claude is thinking hard and shares Dad's plan with your brother's games too.</li>
+      <li><b>One clear request at a time</b> beats ten rushed ones.</li>
+      <li><b>Save often</b> in Studio, and let @forge do the code — you do the ideas and the testing.</li>
+      <li><b>Stuck for more than a few minutes?</b> Grab Dad. That's what teammates are for. 🤝</li>
+    </ul>
+  </div>
+
+  <footer>
+    Made with Dad &amp; Claude · FORGE runs on the ATLAS server · Your game's brain lives in GitHub<br>
+    Have fun building, Daniel! 🚀
+  </footer>
+
+</div>
+</body>
+</html>
