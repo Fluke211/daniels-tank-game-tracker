@@ -1,7 +1,7 @@
 {
   "project": "Daniel's Tank Game",
   "updated": "2026-07-19",
-  "summary": "Tank spawns and drives! Reworked the controls so it steers cleanly instead of drifting sideways.",
+  "summary": "Making the driving rock-solid: you're locked into the tank and keep full control, no more losing the wheel.",
   "milestones": [
     {"id": "m1", "title": "Drivable tank on a test map", "status": "in_progress", "detail": "Drive with WASD, mouse-aimed turret, and a chase camera."},
     {"id": "m2", "title": "Shooting & damage", "status": "todo", "detail": "Click to fire a shell with travel time; tanks take damage and can be destroyed."},
@@ -12,6 +12,7 @@
     {"date": "2026-07-18", "text": "🎉 FORGE build system set up and tested end-to-end. Daniel can now build by talking to @forge in Slack."},
     {"date": "2026-07-19", "text": "🔧 First playtest showed pillars but no tank — reworked tank spawning so it lands on the ground right in front of the spawn pad and seats you automatically."},
     {"date": "2026-07-19", "text": "🐛 Tracked the missing tank to a bad Roblox enum name that crashed tank-building on every spawn. Fixed it — tanks now appear."},
-    {"date": "2026-07-19", "text": "🎮 First drive felt like a drift cart — reworked the controls so the tank drives straight along the way it's facing with no sideways sliding, and keeps you in the driver seat."}
+    {"date": "2026-07-19", "text": "🎮 First drive felt like a drift cart — reworked the controls so the tank drives straight along the way it's facing with no sideways sliding, and keeps you in the driver seat."},
+    {"date": "2026-07-19", "text": "🔒 Researched Roblox's best practices and fixed the big one: control was being lost when the tank's physics ownership slipped back to the server. Now you own your tank, stay locked in the seat, and the grass no longer flickers."}
   ]
 }
