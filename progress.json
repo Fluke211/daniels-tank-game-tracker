@@ -3,7 +3,7 @@
   "updated": "2026-07-18",
   "summary": "The build system is live! Ready to start building the game.",
   "milestones": [
-    {"id": "m1", "title": "Drivable tank on a test map", "status": "todo", "detail": "Drive with WASD, mouse-aimed turret, and a chase camera."},
+    {"id": "m1", "title": "Drivable tank on a test map", "status": "in_progress", "detail": "Drive with WASD, mouse-aimed turret, and a chase camera."},
     {"id": "m2", "title": "Shooting & damage", "status": "todo", "detail": "Click to fire a shell with travel time; tanks take damage and can be destroyed."},
     {"id": "m3", "title": "Domination mode", "status": "todo", "detail": "Capture points, team scoring, and respawns from the garage."},
     {"id": "m4", "title": "Tank builder garage", "status": "todo", "detail": "Build custom tanks from parts with weight and power trade-offs (the hardest part — saved for last)."}
