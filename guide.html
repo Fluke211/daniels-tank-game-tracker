@@ -155,10 +155,13 @@
     <li>Install <b>Rokit</b> (the tool that installs Rojo):
       <span class="cmd">Invoke-RestMethod https://raw.githubusercontent.com/rojo-rbx/rokit/main/scripts/install.ps1 | Invoke-Expression</span>
       Close PowerShell and open a new one so it wakes up.</li>
-    <li>Go into your game folder and add Rojo:
+    <li>Go into your game folder (GitHub Desktop made it — it has files like
+      <span class="inline">default.project.json</span>). Set it up and add Rojo:
       <span class="cmd">cd $HOME\Documents\daniels-tank-game
-rokit add rojo-rbx/rojo
-rokit install</span></li>
+rokit init
+rokit add rojo-rbx/rojo</span>
+      Answer any prompts by pressing Enter. If <span class="inline">rojo</span> isn't found next,
+      close PowerShell and open a fresh one.</li>
     <li>Install the matching Studio plugin:
       <span class="cmd">rojo plugin install</span>
       Now the <b>Rojo</b> button will show up in Studio's <b>Plugins</b> tab.</li>
