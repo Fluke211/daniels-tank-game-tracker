@@ -1,7 +1,7 @@
 {
   "project": "Daniel's Tank Game",
-  "updated": "2026-07-18",
-  "summary": "The build system is live! Ready to start building the game.",
+  "updated": "2026-07-19",
+  "summary": "Fixing the first playtest: making sure you actually spawn inside a drivable tank.",
   "milestones": [
     {"id": "m1", "title": "Drivable tank on a test map", "status": "in_progress", "detail": "Drive with WASD, mouse-aimed turret, and a chase camera."},
     {"id": "m2", "title": "Shooting & damage", "status": "todo", "detail": "Click to fire a shell with travel time; tanks take damage and can be destroyed."},
@@ -9,6 +9,7 @@
     {"id": "m4", "title": "Tank builder garage", "status": "todo", "detail": "Build custom tanks from parts with weight and power trade-offs (the hardest part — saved for last)."}
   ],
   "recent": [
-    {"date": "2026-07-18", "text": "🎉 FORGE build system set up and tested end-to-end. Daniel can now build by talking to @forge in Slack."}
+    {"date": "2026-07-18", "text": "🎉 FORGE build system set up and tested end-to-end. Daniel can now build by talking to @forge in Slack."},
+    {"date": "2026-07-19", "text": "🔧 First playtest showed pillars but no tank — reworked tank spawning so it lands on the ground right in front of the spawn pad and seats you automatically."}
   ]
 }
